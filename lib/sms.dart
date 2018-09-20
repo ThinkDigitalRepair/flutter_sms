@@ -597,7 +597,7 @@ class SmsDb {
 
   SmsDb._private(this._channel);
 
-  Future insert(SmsMessage message) {
-    return this._channel.invokeMethod("insert", message.toMap);
+  Future insert(SmsMessage message) async {
+    return await this._channel.invokeMethod("insert", message.toMap);
   }
 }
