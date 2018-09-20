@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.Telephony;
+import android.util.Log;
 
 import com.babariviere.sms.permisions.Permissions;
 
@@ -26,9 +27,10 @@ public class SmsDb implements MethodChannel.MethodCallHandler, PluginRegistry.Re
     SmsDb(PluginRegistry.Registrar registrar) {
         this.registrar = registrar;
     }
-
+        final String TAG = "SmsDb";
     @Override
     public void onMethodCall(MethodCall methodCall, MethodChannel.Result result) {
+        Log.d(TAG, "onMethodCall: " + methodCall.method);
         if (methodCall.method == "insert") {
             this.address = methodCall.argument("address");
             this.body = methodCall.argument("body");
