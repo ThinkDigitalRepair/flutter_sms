@@ -29,7 +29,7 @@ public class SmsDb implements MethodChannel.MethodCallHandler, PluginRegistry.Re
 
     @Override
     public void onMethodCall(MethodCall methodCall, MethodChannel.Result result) {
-        if (methodCall.method == "insert") {
+        if (methodCall.method.equals("insert")) {
             this.address = methodCall.argument("address");
             this.body = methodCall.argument("body");
             this.date = methodCall.argument("date");

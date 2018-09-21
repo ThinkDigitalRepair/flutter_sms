@@ -516,12 +516,12 @@ class SimCard {
   String imei;
   SimCardState state;
 
-  SimCard({
-    @required this.slot,
-    @required this.imei,
-    this.state = SimCardState.Unknown
-  }) : assert(slot != null),
-       assert(imei != null);
+  SimCard(
+      {@required this.slot,
+      @required this.imei,
+      this.state = SimCardState.Unknown})
+      : assert(slot != null),
+        assert(imei != null);
 
   SimCard.fromJson(Map map) {
     if (map.containsKey('slot')) {
@@ -531,7 +531,7 @@ class SimCard {
       this.imei = map['imei'];
     }
     if (map.containsKey('state')) {
-      switch(map['state']) {
+      switch (map['state']) {
         case 0:
           this.state = SimCardState.Unknown;
           break;
@@ -574,7 +574,7 @@ class SimCardsProvider {
     final simCards = new List<SimCard>();
 
     dynamic response = await _channel.invokeMethod('getSimCards', null);
-    for(Map map in response) {
+    for (Map map in response) {
       simCards.add(new SimCard.fromJson(map));
     }
 
@@ -589,8 +589,7 @@ class SmsDb {
   factory SmsDb() {
     if (_instance == null) {
       final MethodChannel methodChannel = const MethodChannel(
-        "plugins.babariviere.com/smsDb", const JSONMethodCodec()
-      );
+          "plugins.babariviere.com/smsDb", const JSONMethodCodec());
       _instance = new SmsDb._private(methodChannel);
     }
     return _instance;
@@ -598,7 +597,42 @@ class SmsDb {
 
   SmsDb._private(this._channel);
 
-  Future<Null> insert(SmsMessage message) {
-    return this._channel.invokeMethod("insert", message.toMap);
+  /// Inserts an SMS into the phone's database.
+  /// [message] must include address, body, date, dateSent, read and kind.
+  Future insert(SmsMessage message) {
+    assert(message.address != null,
+        "Could not insert SMS because address is required and cannot be null.");
+    assert(message.body != null,
+        "Could not insert SMS because body is required and cannot be null.");
+    assert(message.date != null,
+        "Could not insert SMS because date is required and cannot be null.");
+    assert(message.dateSent != null,
+        "Could not insert SMS because dateSent is required and cannot be null.");
+    assert(message.isRead != null,
+        "Could not insert SMS because isRead is required and cannot be null.");
+    assert(message.kind != null,
+        "Could not insert SMS because kind is required and cannot be null.");
+    Map messageMap = message.toMap;
+    switch (message.kind) {
+      case SmsMessageKind.Sent:
+        {
+          messageMap['kind'] = 0;
+          break;
+        }
+      case SmsMessageKind.Received:
+        {
+          messageMap['kind'] = 1;
+          break;
+        }
+      case SmsMessageKind.Draft:
+        {
+          messageMap['kind'] = 2;
+          break;
+        }
+      default:
+        messageMap['kind'] = 2;
+    }
+    messageMap['read'] = messageMap['read'] == true ? 1 : 0;
+    return this._channel.invokeMethod("insert", messageMap);
   }
 }
