@@ -32,8 +32,8 @@ public class SmsDb implements MethodChannel.MethodCallHandler, PluginRegistry.Re
         if (methodCall.method.equals("insert")) {
             this.address = methodCall.argument("address");
             this.body = methodCall.argument("body");
-            this.date = new Long(methodCall.argument("date"));
-            this.dateSent = new Long(methodCall.argument("dateSent"));
+            this.date = new Long((String) methodCall.argument("date"));
+            this.dateSent = new Long((String) methodCall.argument("dateSent"));
             this.read = methodCall.argument("read");
             this.kind = methodCall.argument("kind");
             insertMessage(result);
