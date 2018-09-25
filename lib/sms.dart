@@ -561,13 +561,19 @@ class SmsThread {
   String _address;
   Contact _contact;
   List<SmsMessage> _messages = [];
-  bool hasAttachment;
-  DateTime date;
+  bool _hasAttachment;
+  DateTime _date;
 
-  SmsThread(int id, {String address, List<SmsMessage> messages, this.date})
+  SmsThread(int id,
+      {String address,
+      List<SmsMessage> messages,
+      DateTime date,
+      bool hasAttachment})
       : this._id = id,
         this._address = address,
-        this._messages = messages;
+        this._messages = messages != null ? messages : [],
+        this._date = date,
+        this._hasAttachment = hasAttachment;
 
   /// Create a thread from a list of message, the id will be taken from
   /// the first message
