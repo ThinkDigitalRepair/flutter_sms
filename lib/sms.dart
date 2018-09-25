@@ -618,7 +618,7 @@ class SmsThread {
   set messages(List<SmsMessage> messages) => this._messages = messages;
 
   ///the last sms in your thread. This is usually the visible text in an SMS app.
-  String get snippet => messages.last?.body;
+  String get snippet => messages.last?.body?.substring(0, 44);
 
   /// Get thread id (for compatibility)
   int get threadId => this._id;
