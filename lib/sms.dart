@@ -606,6 +606,10 @@ class SmsThread {
   /// Set contact info
   set contact(Contact contact) => this._contact = contact;
 
+  set date(DateTime date) => this._date = date;
+
+  get date => _date;
+
   /// Get thread id
   int get id => this._id;
 
