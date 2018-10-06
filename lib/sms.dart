@@ -2,6 +2,7 @@
 library sms;
 
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -289,6 +290,21 @@ class SmsMessage implements Comparable<SmsMessage> {
   int compareTo(SmsMessage other) {
     return other._id - this._id;
   }
+
+  @override
+  bool operator ==(other) =>
+      other is SmsMessage &&
+          this.threadId == other.threadId &&
+          this.body == other.body &&
+          this.address == other.address &&
+          this.date == other.date &&
+          this.dateSent == other.dateSent;
+
+  @override
+  int get hashCode => hashValues(threadId, body, address, date, dateSent);
+
+  @override
+  String toString() => toMap.toString();
 }
 
 enum SmsMessageKind {
@@ -556,7 +572,7 @@ class SmsSender {
 }
 
 /// A SMS thread
-class SmsThread {
+class SmsThread extends Iterable {
   int _id;
   String _address;
   Contact _contact;
@@ -608,7 +624,7 @@ class SmsThread {
 
   set date(DateTime date) => this._date = date;
 
-  get date => _date;
+  DateTime get date => _date;
 
   /// Get thread id
   int get id => this._id;
@@ -664,4 +680,7 @@ class SmsThread {
       this._contact = contact;
     }
   }
+
+  @override
+  Iterator get iterator => messages.iterator;
 }
