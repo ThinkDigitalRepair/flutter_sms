@@ -61,6 +61,12 @@ public class SmsDb implements MethodChannel.MethodCallHandler, PluginRegistry.Re
             case 2:
                 box = Telephony.Sms.Draft.CONTENT_URI;
                 break;
+            case 3:
+            case 4:
+            case 5:
+                box = Telephony.Sms.Outbox.CONTENT_URI;
+            break;
+
             default:
                 box = Telephony.Sms.Inbox.CONTENT_URI;
         }

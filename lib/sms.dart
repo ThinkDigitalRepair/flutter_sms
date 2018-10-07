@@ -311,6 +311,9 @@ enum SmsMessageKind {
   Sent,
   Received,
   Draft,
+  Outbox,
+  Failed,
+  Queued
 }
 
 enum SmsMessageState {
