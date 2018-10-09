@@ -30,16 +30,20 @@ public class SmsDb implements MethodChannel.MethodCallHandler, PluginRegistry.Re
     @Override
     public void onMethodCall(MethodCall methodCall, MethodChannel.Result result) {
         if (methodCall.method.equals("insert")) {
-            Map sms = methodCall.arguments();
-
-            Log.d(TAG, "onMethodCall: "
-                    + sms.toString());
             this.address = methodCall.argument("address");
             this.body = methodCall.argument("body");
-            this.date = methodCall.argument("date") == null ? Long.valueOf(0):
-                    methodCall.argument("date");
-            this.dateSent = methodCall.argument("dateSent") == null ? Long.valueOf(0):
-                    methodCall.argument("dateSent");
+
+            if(methodCall.argument("date") == null)
+                this.date = Long.valueOf("");
+            else
+                this.date = Long.valueOf(methodCall.argument("date").toString());
+
+            if(methodCall.argument("dateSent") == null)
+                this.dateSent = Long.valueOf("");
+            else
+                this.dateSent = Long.valueOf(methodCall.argument("dateSent").toString());
+
+
             this.read = methodCall.argument("read");
             this.kind = methodCall.argument("kind");
             insertMessage(result);
