@@ -30,10 +30,16 @@ public class SmsDb implements MethodChannel.MethodCallHandler, PluginRegistry.Re
     @Override
     public void onMethodCall(MethodCall methodCall, MethodChannel.Result result) {
         if (methodCall.method.equals("insert")) {
+            Map sms = methodCall.arguments();
+
+            Log.d(TAG, "onMethodCall: "
+                    + sms.toString());
             this.address = methodCall.argument("address");
             this.body = methodCall.argument("body");
-            this.date = new Long((String) methodCall.argument("date"));
-            this.dateSent = new Long((String) methodCall.argument("dateSent"));
+            this.date = methodCall.argument("date") == null ? Long.valueOf(0):
+                    methodCall.argument("date");
+            this.dateSent = methodCall.argument("dateSent") == null ? Long.valueOf(0):
+                    methodCall.argument("dateSent");
             this.read = methodCall.argument("read");
             this.kind = methodCall.argument("kind");
             insertMessage(result);
@@ -65,7 +71,7 @@ public class SmsDb implements MethodChannel.MethodCallHandler, PluginRegistry.Re
             case 4:
             case 5:
                 box = Telephony.Sms.Outbox.CONTENT_URI;
-            break;
+                break;
 
             default:
                 box = Telephony.Sms.Inbox.CONTENT_URI;
