@@ -307,14 +307,7 @@ class SmsMessage implements Comparable<SmsMessage> {
   String toString() => toMap.toString();
 }
 
-enum SmsMessageKind {
-  Sent,
-  Received,
-  Draft,
-  Outbox,
-  Failed,
-  Queued
-}
+enum SmsMessageKind { Sent, Received, Draft, Outbox, Failed, Queued }
 
 enum SmsMessageState {
   Sending,
@@ -632,6 +625,8 @@ class SmsThread extends Iterable {
   /// Get thread id
   int get id => this._id;
 
+  set id(int id) => this._id;
+
   int get messageCount => _messages.length;
 
   /// Get messages from thread
@@ -642,7 +637,7 @@ class SmsThread extends Iterable {
 
   ///the last sms in your thread. This is usually the visible text in an SMS app.
   String get snippet {
-    if (messages.last != null) {
+    if (messages.length > 0) {
       String lastMessage = messages.last.body;
       if (lastMessage.length > 45)
         return lastMessage.substring(0, 44);
@@ -653,7 +648,11 @@ class SmsThread extends Iterable {
   }
 
   /// Get thread id (for compatibility)
+  /// use id
+  @deprecated
   int get threadId => this._id;
+
+  set threadId(int id) => this._id = id;
 
   /// Add a message at the end
   void addMessage(SmsMessage msg) {
