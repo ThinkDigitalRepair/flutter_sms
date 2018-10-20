@@ -297,14 +297,13 @@ class SmsMessage implements Comparable<SmsMessage> {
   @override
   bool operator ==(other) =>
       other is SmsMessage &&
-          this.threadId == other.threadId &&
           this.body == other.body &&
           this.address == other.address &&
           this.date == other.date &&
           this.dateSent == other.dateSent;
 
   @override
-  int get hashCode => hashValues(threadId, body, address, date, dateSent);
+  int get hashCode => hashValues(body, address, date, dateSent);
 
   @override
   String toString() => toMap.toString();
