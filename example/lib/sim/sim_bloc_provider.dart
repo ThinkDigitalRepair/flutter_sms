@@ -1,8 +1,10 @@
 import 'package:flutter/widgets.dart';
+
 import 'sim_bloc.dart';
 
 class SimCardsBlocProvider extends InheritedWidget {
-  SimCardsBlocProvider({this.simCardBloc, @required Widget child})
+  SimCardsBlocProvider(
+      {this.simCardBloc, @required Widget child}) // ignore: undefined_annotation
       : assert(child != null),
         super(child: child);
 

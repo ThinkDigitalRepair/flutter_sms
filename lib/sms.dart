@@ -2,7 +2,6 @@
 library sms;
 
 import 'dart:async';
-import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -16,10 +15,9 @@ class SimCard {
   String imei;
   SimCardState state;
 
-  SimCard(
-      {@required this.slot,
-      @required this.imei,
-      this.state = SimCardState.Unknown})
+  SimCard({@required this.slot,
+    @required this.imei,
+    this.state = SimCardState.Unknown})
       : assert(slot != null),
         assert(imei != null);
 
@@ -108,19 +106,30 @@ class SmsDb {
 
   /// Inserts an SMS into the phone's database.
   /// [message] must include address, body, date, dateSent, read and kind.
-  Future insert(SmsMessage message) {
+  Future insertMessage(SmsMessage message) {
+    Map messageMap = _convert(message);
+    return this._channel.invokeMethod("insertMessage", messageMap);
+  }
+
+  Future insertMessages(List<SmsMessage> messages) {
+    var messageMaps = messages.map((message) => _convert(message)).toList(
+        growable: false);
+    return this._channel.invokeMethod("insertMessages", messageMaps);
+  }
+
+  Map _convert(SmsMessage message) {
     assert(message.address != null,
-        "Could not insert SMS because address is required and cannot be null.");
+    "Could not insert SMS because address is required and cannot be null.");
     assert(message.body != null,
-        "Could not insert SMS because body is required and cannot be null.");
+    "Could not insert SMS because body is required and cannot be null.");
     assert(message.date != null,
-        "Could not insert SMS because date is required and cannot be null.");
+    "Could not insert SMS because date is required and cannot be null.");
     assert(message.dateSent != null,
-        "Could not insert SMS because dateSent is required and cannot be null.");
+    "Could not insert SMS because dateSent is required and cannot be null.");
     assert(message.isRead != null,
-        "Could not insert SMS because isRead is required and cannot be null.");
+    "Could not insert SMS because isRead is required and cannot be null.");
     assert(message.kind != null,
-        "Could not insert SMS because kind is required and cannot be null.");
+    "Could not insert SMS because kind is required and cannot be null.");
     Map messageMap = message.toMap;
     switch (message.kind) {
       case SmsMessageKind.Sent:
@@ -142,7 +151,8 @@ class SmsDb {
         messageMap['kind'] = 2;
     }
     messageMap['read'] = messageMap['read'] == true ? 1 : 0;
-    return this._channel.invokeMethod("insert", messageMap);
+
+    return messageMap;
   }
 }
 
@@ -160,15 +170,15 @@ class SmsMessage implements Comparable<SmsMessage> {
   SmsMessageKind _kind;
   SmsMessageState _state = SmsMessageState.None;
   StreamController<SmsMessageState> _stateStreamController =
-      new StreamController<SmsMessageState>();
+  new StreamController<SmsMessageState>();
 
   SmsMessage(this._address, this._body,
       {int id,
-      int threadId,
-      bool read,
-      DateTime date,
-      DateTime dateSent,
-      SmsMessageKind kind}) {
+        int threadId,
+        bool read,
+        DateTime date,
+        DateTime dateSent,
+        SmsMessageKind kind}) {
     this._id = id;
     this._threadId = threadId;
     this._read = read;
@@ -207,7 +217,7 @@ class SmsMessage implements Comparable<SmsMessage> {
     }
     if (data.containsKey("date_sent")) {
       this._dateSent =
-          new DateTime.fromMillisecondsSinceEpoch(data["date_sent"]);
+      new DateTime.fromMillisecondsSinceEpoch(data["date_sent"]);
     }
   }
 
@@ -303,7 +313,10 @@ class SmsMessage implements Comparable<SmsMessage> {
           this.dateSent == other.dateSent;
 
   @override
-  int get hashCode => hashValues(body, address, date, dateSent);
+  int get hashCode =>
+      StringBuffer([body, address, date, dateSent])
+          .toString()
+          .hashCode;
 
   @override
   String toString() => toMap.toString();
@@ -360,13 +373,12 @@ class SmsQuery {
   }
 
   /// Query a list of SMS
-  Future<List<SmsMessage>> querySms(
-      {int start,
-      int count,
-      String address,
-      int threadId,
-      List<SmsQueryKind> kinds: const [SmsQueryKind.Inbox],
-      bool sort: true}) async {
+  Future<List<SmsMessage>> querySms({int start,
+    int count,
+    String address,
+    int threadId,
+    List<SmsQueryKind> kinds: const [SmsQueryKind.Inbox],
+    bool sort: true}) async {
     List<SmsMessage> result = [];
     for (var kind in kinds) {
       result
@@ -398,12 +410,11 @@ class SmsQuery {
   }
 
   /// Wrapper for query only one kind
-  Future<List<SmsMessage>> _querySmsWrapper(
-      {int start,
-      int count,
-      String address,
-      int threadId,
-      SmsQueryKind kind: SmsQueryKind.Inbox}) async {
+  Future<List<SmsMessage>> _querySmsWrapper({int start,
+    int count,
+    String address,
+    int threadId,
+    SmsQueryKind kind: SmsQueryKind.Inbox}) async {
     Map arguments = {};
     if (start != null && start >= 0) {
       arguments["start"] = start;
@@ -490,7 +501,7 @@ class SmsSender {
   Map<int, SmsMessage> _sentMessages;
   int _sentId = 0;
   final StreamController<SmsMessage> _deliveredStreamController =
-      new StreamController<SmsMessage>();
+  new StreamController<SmsMessage>();
 
   factory SmsSender() {
     if (_instance == null) {
@@ -570,7 +581,7 @@ class SmsSender {
 }
 
 /// A SMS thread
-class SmsThread extends Iterable {
+class SmsThread extends Iterable<SmsMessage> {
   int _id;
   String _address;
   Contact _contact;
@@ -580,9 +591,9 @@ class SmsThread extends Iterable {
 
   SmsThread(int id,
       {String address,
-      List<SmsMessage> messages,
-      DateTime date,
-      bool hasAttachment})
+        List<SmsMessage> messages,
+        DateTime date,
+        bool hasAttachment})
       : this._id = id,
         this._address = address,
         this._messages = messages != null ? messages : [],
@@ -689,5 +700,5 @@ class SmsThread extends Iterable {
   }
 
   @override
-  Iterator get iterator => messages.iterator;
+  Iterator<SmsMessage> get iterator => messages.iterator;
 }
